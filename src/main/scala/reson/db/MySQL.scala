@@ -3,6 +3,9 @@ package reson.db
 import com.twitter.conversions.time._
 import com.twitter.finagle.client.DefaultPool
 import com.twitter.finagle.exp.Mysql
+//import com.twitter.finagle.postgres._
+//import com.twitter.finagle.postgres.values._
+
 import com.twitter.finagle.exp.mysql.OK
 import com.twitter.util.Future
 import rapture.json._
@@ -13,9 +16,8 @@ import rapture.json.jsonBackends.jackson._
   */
 
 object MySQL extends MySQL2Json {
-
   val dbConf = ConnectionConfig(sys.props.get("db_uri").getOrElse(sys.env("db_uri")))
-
+  println(sys.props.get("db_uri").getOrElse(sys.env("db_uri")) )
   lazy val db = Mysql.client
     .withCredentials(dbConf.user, dbConf.pass.getOrElse(null))
     .withDatabase(dbConf.dbName)
@@ -37,7 +39,7 @@ object MySQL extends MySQL2Json {
         """SELECT TABLE_SCHEMA as `schema`, TABLE_NAME as name, TABLE_TYPE = 'BASE TABLE' as insertable
           |FROM information_schema.tables
           |WHERE TABLE_SCHEMA = ? """.stripMargin)
-        .select(dbConf.dbName)(Json(_))
+        .select(dbConf.dbName)(Json(_)) // dbName is fed into sql statement as param "?"
         .map(_.map(fixBigintToBool))
     jbListF.map(lj => Json(lj).toString)
   }

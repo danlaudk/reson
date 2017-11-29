@@ -5,11 +5,7 @@ package reson.db
   */
 
 import java.util.{Date, TimeZone}
-//import com.twitter.finagle.postgres._
-//import com.twitter.finagle.postgres.values._
-//import com.twitter.finagle.postgres._
 
-import com.twitter.finagle.exp.mysql
 import com.twitter.finagle.exp.mysql._
 import rapture.json._
 import rapture.json.jsonBackends.jackson._
@@ -18,9 +14,8 @@ import rapture.json.jsonBackends.jackson._
 /**
   * Created by sscarduzio on 22/12/2015.
   */
-final case class ParsingException(msg: String) extends Exception(msg)
 
-trait MySQL2Json {
+trait MySQL2JsonArchive {
 
   // Assuming local and extraction time zones are UTC
   val tz = TimeZone.getTimeZone("UTC")
@@ -49,18 +44,8 @@ trait MySQL2Json {
     case _ => throw new ParsingException(s"""Unsupported column $key => $v""")
 
   }
-//
-//  def mkValuesListJsonText(row:com.twitter.finagle.postgres.Row):IndexedSeq[String] = {
-//    val length = row.
-//    row.get()
-//  } // not parameterized over value
-// val SelectResult(fields, rows) = connection.receive(ReadyForQuery('I')).get
-// tojsonserializer = contramap (implicit val fieldCounter ) {}
-  // implicit val fieldCounterInstance = // put this in the db mysql file inside object mysql.
-  // = db.queryfornumberoffields
 
-  // used by rapture in call to Json(row)
-  implicit val mysqlRowToJsonSerializer = Json.serializer[Json].contramap[Row] { row =>
+  implicit val mysqlRowToJsonSerializerArchive = Json.serializer[Json].contramap[Row] { row =>
     val zippedMap = row.fields.zip(row.values)
     val listOfJson: IndexedSeq[String] = zippedMap.map(t => mkValue(t._1.name, t._2))
 
@@ -68,3 +53,4 @@ trait MySQL2Json {
     Json(jb)
   }
 }
+
