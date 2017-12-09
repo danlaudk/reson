@@ -5,7 +5,6 @@ version := "1.0"
 scalaVersion := "2.11.7"
 
 //resolvers += "bintray-djspiewak-maven" at "https://dl.bintray.com/djspiewak/maven"
-
 libraryDependencies ++= Seq(
   "com.twitter" %% "finagle-http" % "6.33.0",
   "com.twitter" %% "finagle-mysql" % "6.33.0",

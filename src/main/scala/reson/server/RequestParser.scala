@@ -13,6 +13,7 @@ import reson.util.Transformers._
 
 import scala.collection.immutable.Iterable
 import scala.util.{Failure, Try}
+import scala.util.parsing.combinator._
 
 /**
   * Created by sscarduzio on 11/01/2016.
@@ -68,11 +69,34 @@ case class DeleteQ(table: String, where: Ops) extends TableQuery with Where {
       .toTry(new Exception("a where clause is needed for deletion (you need to be more explicit if you really intend to delete everything!)"))
   }
 }
-
+// case class SelectQWithStructure() extends OR use {MySQL.dbStructure directly in SelectQ - prefer latter
 case class SelectQ(table: String, select: String, where: Ops, order: Option[Order], limit: Option[(Int, Int)]) extends TableQuery with Where {
   def materialize = Try {
     s"""SELECT $select from $table ${whereString} $formatOrder $formatLimit"""
   }
+  val dbStructure = MySQL.dbStructure
+  case class SelectItem(fieldName:String)
+  case class SelectNode(tableName:String, fields:List[SelectItem]) // filters [Filter], order ?
+  // single query flatmap addjoinconditions
+  // addjoinconditions is recursive
+  // def singleRequestToQuery = materialize
+
+  // JSON_ARRAY(row)
+  /*
+  select json_object(
+  'id',p.id
+ ,'desc',p.`desc`
+ ,'child_objects',(select CAST(CONCAT('[',
+                GROUP_CONCAT(
+                  JSON_OBJECT(
+                    'id',id,'parent_id',parent_id,'desc',`desc`)),
+                ']')
+         AS JSON) from child_table where parent_id = p.id)
+
+ ) from parent_table p;
+   */
+  //def parserSelect():Parser[]
+
 
   def formatOrder = order.map(_.toString).getOrElse("")
 

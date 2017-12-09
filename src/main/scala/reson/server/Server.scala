@@ -19,8 +19,11 @@ import rapture.json.jsonBackends.jackson._
 object Server extends App {
   def handle(req: Request, table: String, f: String => Future[String]): Future[Response] = {
     for {
-      query <- RequestParser.parse(req, table).toFuture
-      qString <- query.materialize.toFuture
+      query <- RequestParser.parse(req, table).toFuture // try[query].tofuture
+      // queryWithStructure <- query.addStructure // SelectQ type to SelectQwithStructure with input MySQL.dbStructure
+      // test:keep read the same queryOnStructure.materialize.toFuture
+      qString <- MySQL.dbStructure.toFuture
+      //qString <- query.materialize.toFuture
       dbResp <- f(qString)
     } yield mkResp(dbResp)
   }
